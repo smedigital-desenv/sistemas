@@ -34,7 +34,7 @@
   /* texto */
   --sme-texto:#E6EEF4;
   --sme-texto-2:#94A0AB;
-  --sme-texto-3:#7E8A96;
+  --sme-texto-3:#8996A3;
 
   /* folha clara de leitura — constante nos dois temas */
   --sme-folha:#FCFCFD;
@@ -44,6 +44,13 @@
 
   --sme-sombra:0 24px 60px -30px rgba(0,0,0,.85);
 }
+
+/* Três níveis de fundo escuro. Monitor barato esmaga o escuro: o mesmo azul
+   que aparece num painel bom vira preto chapado noutro. Escolha o nível
+   testando no monitor pior da rede, não no melhor.
+   Os três passam em AA com os tokens de texto acima. */
+:root[data-fundo="medio"]{ --sme-fundo:#14232F; }
+:root[data-fundo="claro"]{ --sme-fundo:#1B2E3E; }
 
 :root[data-tema="claro"]{
   /* Sobre fundo claro o ciano vivo não serve como cor de TEXTO: #45D6F2 sobre
@@ -127,22 +134,11 @@
     radial-gradient(96% 58% at 50% 106%, rgba(var(--sme-halo),var(--sme-halo-baixo)) 0%, rgba(var(--sme-halo),0) 74%);
 }
 
-/* Poeira de partículas: o segundo elemento que dá profundidade ao fundo da
-   referência. Opcional — some sozinho no tema claro. */
-.sme::after{
-  content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
-  background-image:
-    radial-gradient(1.4px 1.4px at 18% 22%, rgba(214,240,255,.55), transparent),
-    radial-gradient(1px 1px at 63% 12%, rgba(214,240,255,.40), transparent),
-    radial-gradient(1.2px 1.2px at 82% 31%, rgba(214,240,255,.34), transparent),
-    radial-gradient(1px 1px at 34% 58%, rgba(214,240,255,.30), transparent),
-    radial-gradient(1.3px 1.3px at 71% 68%, rgba(214,240,255,.36), transparent),
-    radial-gradient(1px 1px at 9% 74%, rgba(214,240,255,.26), transparent),
-    radial-gradient(1.1px 1.1px at 46% 88%, rgba(214,240,255,.30), transparent),
-    radial-gradient(1px 1px at 90% 82%, rgba(214,240,255,.24), transparent);
-  animation:sme-cintila 7s ease-in-out infinite alternate;
-}
-@keyframes sme-cintila{ from{ opacity:.55; } to{ opacity:1; } }
+/* Campo de estrelas e riscos de luz. O desenho é feito em canvas por
+   sme-ceu.js — um único risco em CSS ficava pobre perto da referência.
+   Marcação: <canvas id="ceu" aria-hidden="true"></canvas> logo após <body>. */
+#ceu{ position:fixed; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+:root[data-tema="claro"] #ceu{ display:none; }
 
 /* Arcos pontilhados. Coloque de um a três <span class="sme-orbita sme-orbita--1">
    logo depois de abrir o <body>. */
@@ -152,9 +148,10 @@
 }
 .sme-orbita--1{ width:150vw; height:150vw; left:-25vw; top:-96vw; }
 .sme-orbita--2{ width:104vw; height:104vw; left:2vw; top:-58vw; border-color:rgba(var(--sme-halo),.30); }
-.sme-orbita--3{ width:190vw; height:190vw; left:-45vw; top:34vw; border-color:rgba(var(--sme-halo),.22); }
+.sme-orbita--3{ width:190vw; height:190vw; left:-45vw; top:34vw; border-color:rgba(var(--sme-halo),.26); }
+.sme-orbita--4{ width:126vw; height:126vw; right:-38vw; top:-40vw; left:auto; border-color:rgba(var(--sme-halo),.30); }
+.sme-orbita--5{ width:70vw; height:70vw; right:-14vw; top:6vw; left:auto; border-style:dashed; border-color:rgba(var(--sme-halo),.20); }
 
-:root[data-tema="claro"] .sme::after,
 :root[data-tema="claro"] .sme-orbita{ display:none; }
 
 .sme :focus-visible{ outline:2px solid var(--sme-acento); outline-offset:3px; }
