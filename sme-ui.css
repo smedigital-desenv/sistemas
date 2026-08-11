@@ -29,8 +29,8 @@
 
   /* texto */
   --sme-texto:#E6EEF4;
-  --sme-texto-2:rgba(230,238,244,.62);
-  --sme-texto-3:rgba(230,238,244,.42);
+  --sme-texto-2:#94A0AB;
+  --sme-texto-3:#7E8A96;
 
   /* folha clara de leitura — constante nos dois temas */
   --sme-folha:#FCFCFD;
@@ -42,6 +42,11 @@
 }
 
 :root[data-tema="claro"]{
+  /* Sobre fundo claro o ciano vivo não serve como cor de TEXTO: #45D6F2 sobre
+     branco dá ~1.9:1 e reprova no AA da WCAG/eMAG. O acento continua o mesmo em
+     preenchimento, borda e brilho; só o texto usa a versão escurecida. */
+  --sme-acento-texto:#0A6C87;
+  --sme-atencao-texto:#8A6212;
   --sme-fundo:#F4F7FA;
   --sme-halo:14,78,140;
   --sme-halo-forca:.07;
@@ -51,8 +56,8 @@
   --sme-borda-forte:#C4CDD6;
 
   --sme-texto:#0E1620;
-  --sme-texto-2:#5A6874;
-  --sme-texto-3:#8996A3;
+  --sme-texto-2:#4A5763;
+  --sme-texto-3:#5F6B77;
 
   --sme-sombra:0 1px 2px rgba(14,22,32,.05), 0 10px 28px -16px rgba(14,22,32,.20);
 }
@@ -62,6 +67,8 @@
   --sme-acento:#45D6F2;
   --sme-acento-tinta:#04212B;        /* texto sobre o acento */
   --sme-acento-rgb:69,214,242;
+  --sme-acento-texto:var(--sme-acento);
+  --sme-atencao-texto:var(--sme-atencao);
 
   /* semânticas — separadas do acento de propósito */
   --sme-ok:#3FD69A;
@@ -96,11 +103,7 @@
 
 .sme{
   margin:0;
-  background-color:var(--sme-fundo);
-  background-image:
-    radial-gradient(52% 46% at 50% -8%, rgba(var(--sme-halo),var(--sme-halo-forca)) 0%, rgba(var(--sme-halo),0) 66%),
-    radial-gradient(74% 36% at 50% 106%, rgba(var(--sme-halo),calc(var(--sme-halo-forca) * .7)) 0%, rgba(var(--sme-halo),0) 70%);
-  background-attachment:fixed;
+  background:var(--sme-fundo);
   color:var(--sme-texto);
   font-family:var(--sme-sans);
   font-size:16px;
@@ -108,11 +111,21 @@
   -webkit-font-smoothing:antialiased;
 }
 
+/* O brilho de fundo vai num pseudo-elemento fixo, e não em
+   background-attachment:fixed: com os cartões em transform 3D, o Chromium cria
+   camadas de composição e o fundo fixo aparece costurado atrás delas. */
+.sme::before{
+  content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    radial-gradient(52% 46% at 50% 0%, rgba(var(--sme-halo),var(--sme-halo-forca)) 0%, rgba(var(--sme-halo),0) 66%),
+    radial-gradient(74% 40% at 50% 100%, rgba(var(--sme-halo),calc(var(--sme-halo-forca) * .7)) 0%, rgba(var(--sme-halo),0) 70%);
+}
+
 .sme :focus-visible{ outline:2px solid var(--sme-acento); outline-offset:3px; }
 .sme a{ color:inherit; }
 .sme img{ max-width:100%; display:block; }
 
-.sme-larg{ max-width:var(--sme-largura); margin:0 auto; padding:0 var(--sme-e5); }
+.sme-larg{ max-width:var(--sme-largura); margin:0 auto; padding:0 var(--sme-e5); position:relative; z-index:4; }
 
 /* ─── 3. TIPOGRAFIA ─────────────────────────────────────── */
 
@@ -171,19 +184,19 @@
   font-size:17px; font-weight:600; letter-spacing:-.01em;
   text-decoration:none;
 }
-.sme-marca em{ font-style:normal; color:var(--sme-acento); font-weight:400; }
+.sme-marca em{ font-style:normal; color:var(--sme-acento-texto); font-weight:400; }
 
 .sme-topo-centro{
   font-family:var(--sme-serifada);
   font-size:14px; color:var(--sme-texto-2);
 }
-.sme-topo-centro b{ color:var(--sme-acento); font-weight:400; font-style:italic; }
+.sme-topo-centro b{ color:var(--sme-acento-texto); font-weight:400; font-style:italic; }
 
 .sme-menu{ display:flex; gap:var(--sme-e5); font-size:13px; }
 .sme-menu a{ color:var(--sme-texto-2); text-decoration:none; transition:color var(--sme-transicao); }
 .sme-menu a:hover{ color:var(--sme-texto); }
 .sme-menu a[aria-current="page"]{ color:var(--sme-texto); }
-.sme-menu a[aria-current="page"]::before{ content:"/ "; color:var(--sme-acento); }
+.sme-menu a[aria-current="page"]::before{ content:"/ "; color:var(--sme-acento-texto); }
 
 /* contador de progresso do canto */
 .sme-contador{
@@ -273,8 +286,13 @@
   .sme-muro--3col{ grid-template-columns:repeat(3,1fr); }
   .sme-muro--4col{ grid-template-columns:repeat(4,1fr); }
 }
-/* inclinação 3D: só em muro de conteúdo, nunca em tabela */
+/* Inclinação 3D: só em muro de conteúdo, nunca em tabela — e só quando o
+   cartão é estreito. Num cartão largo a mesma rotação vira vários pixels de
+   deslocamento entre uma ponta e outra, e a borda aparece torta. */
 .sme-muro--inclinado{ perspective:1400px; }
+.sme-muro--inclinado.sme-muro--3col{ perspective:none; }
+.sme-muro--inclinado.sme-muro--3col .sme-cartao,
+.sme-muro--inclinado.sme-muro--3col .sme-cartao:nth-child(even){ transform:none; }
 .sme-muro--inclinado .sme-cartao{ transform:rotateY(3deg) rotateZ(-.4deg); }
 .sme-muro--inclinado .sme-cartao:nth-child(even){ transform:rotateY(-3deg) rotateZ(.4deg); }
 .sme-muro--inclinado .sme-cartao:hover{ transform:rotateY(0) rotateZ(0) translateY(-2px); }
@@ -306,7 +324,7 @@
   letter-spacing:-.01em; color:var(--sme-texto);
 }
 .sme-cartao .sme-cartao-desc{ font-size:13px; line-height:1.44; color:var(--sme-texto-2); }
-.sme-cartao .sme-cartao-seta{ margin-top:auto; font-size:15px; color:var(--sme-acento); }
+.sme-cartao .sme-cartao-seta{ margin-top:auto; font-size:15px; color:var(--sme-acento-texto); }
 
 /* faísca no canto, aparece no hover */
 .sme-cartao .sme-faisca{
