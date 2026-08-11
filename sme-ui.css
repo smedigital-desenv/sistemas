@@ -1,0 +1,558 @@
+/* ============================================================
+   sme-ui.css — sistema de design dos sistemas da SME Ribeirão Preto
+   ------------------------------------------------------------
+   Arquivo único de tokens + componentes. CSS puro, sem build,
+   sem framework. Conviva com o Bootstrap onde ele já existe.
+
+   Como usar:
+     <link rel="stylesheet" href="https://smedigital-desenv.github.io/sistemas/sme-ui.css">
+
+   Temas (atributo no <html>):
+     data-tema="escuro"  (padrão)  ·  data-tema="claro"
+     data-acento="ciano" (padrão)  ·  data-acento="neon"
+
+   VERSÃO DE VALIDAÇÃO — ainda não usar em produção.
+   ============================================================ */
+
+/* ─── 1. TOKENS ─────────────────────────────────────────── */
+
+:root,
+:root[data-tema="escuro"]{
+  /* superfícies */
+  --sme-fundo:#04070D;
+  --sme-halo:14,78,140;              /* rgb do brilho radial */
+  --sme-halo-forca:.62;
+  --sme-superficie:rgba(255,255,255,.045);
+  --sme-superficie-2:rgba(255,255,255,.075);
+  --sme-borda:rgba(255,255,255,.10);
+  --sme-borda-forte:rgba(255,255,255,.18);
+
+  /* texto */
+  --sme-texto:#E6EEF4;
+  --sme-texto-2:rgba(230,238,244,.62);
+  --sme-texto-3:rgba(230,238,244,.42);
+
+  /* folha clara de leitura — constante nos dois temas */
+  --sme-folha:#FCFCFD;
+  --sme-folha-texto:#12161A;
+  --sme-folha-texto-2:#5A6169;
+  --sme-folha-borda:#E4E7EA;
+
+  --sme-sombra:0 24px 60px -30px rgba(0,0,0,.85);
+}
+
+:root[data-tema="claro"]{
+  --sme-fundo:#F4F7FA;
+  --sme-halo:14,78,140;
+  --sme-halo-forca:.07;
+  --sme-superficie:#FFFFFF;
+  --sme-superficie-2:#FFFFFF;
+  --sme-borda:#DFE5EB;
+  --sme-borda-forte:#C4CDD6;
+
+  --sme-texto:#0E1620;
+  --sme-texto-2:#5A6874;
+  --sme-texto-3:#8996A3;
+
+  --sme-sombra:0 1px 2px rgba(14,22,32,.05), 0 10px 28px -16px rgba(14,22,32,.20);
+}
+
+:root{
+  /* acento — ciano rebaixado, legível em texto pequeno */
+  --sme-acento:#45D6F2;
+  --sme-acento-tinta:#04212B;        /* texto sobre o acento */
+  --sme-acento-rgb:69,214,242;
+
+  /* semânticas — separadas do acento de propósito */
+  --sme-ok:#3FD69A;
+  --sme-atencao:#E8B54A;
+  --sme-critico:#F0776B;
+
+  /* tipografia */
+  --sme-serifada:"Newsreader","Iowan Old Style","Palatino Linotype",Georgia,serif;
+  --sme-sans:"DM Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --sme-mono:"DM Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+
+  /* espaço e forma */
+  --sme-e1:4px; --sme-e2:8px; --sme-e3:12px; --sme-e4:16px;
+  --sme-e5:24px; --sme-e6:32px; --sme-e7:48px;
+  --sme-r1:4px; --sme-r2:9px; --sme-r3:14px; --sme-r-pilula:999px;
+  --sme-transicao:.25s cubic-bezier(.2,.7,.3,1);
+  --sme-largura:1180px;
+}
+
+/* acento alternativo: o neon original da identidade atual */
+:root[data-acento="neon"]{
+  --sme-acento:#00E5FF;
+  --sme-acento-rgb:0,229,255;
+  --sme-acento-tinta:#00232B;
+}
+
+/* ─── 2. BASE ───────────────────────────────────────────── */
+
+.sme *,
+.sme *::before,
+.sme *::after{ box-sizing:border-box; }
+
+.sme{
+  margin:0;
+  background-color:var(--sme-fundo);
+  background-image:
+    radial-gradient(52% 46% at 50% -8%, rgba(var(--sme-halo),var(--sme-halo-forca)) 0%, rgba(var(--sme-halo),0) 66%),
+    radial-gradient(74% 36% at 50% 106%, rgba(var(--sme-halo),calc(var(--sme-halo-forca) * .7)) 0%, rgba(var(--sme-halo),0) 70%);
+  background-attachment:fixed;
+  color:var(--sme-texto);
+  font-family:var(--sme-sans);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+.sme :focus-visible{ outline:2px solid var(--sme-acento); outline-offset:3px; }
+.sme a{ color:inherit; }
+.sme img{ max-width:100%; display:block; }
+
+.sme-larg{ max-width:var(--sme-largura); margin:0 auto; padding:0 var(--sme-e5); }
+
+/* ─── 3. TIPOGRAFIA ─────────────────────────────────────── */
+
+.sme-titulo{
+  font-family:var(--sme-serifada);
+  font-weight:400;
+  line-height:1.06;
+  letter-spacing:-.018em;
+  text-wrap:balance;
+  margin:0;
+}
+.sme-titulo--g{ font-size:clamp(30px,4.6vw,52px); }
+.sme-titulo--m{ font-size:clamp(24px,3vw,34px); }
+.sme-titulo--p{ font-size:20px; line-height:1.16; }
+
+/* sublinhado como ênfase, no lugar de negrito ou cor */
+.sme-enfase{
+  text-decoration:underline;
+  text-decoration-thickness:1.5px;
+  text-underline-offset:5px;
+  text-decoration-color:color-mix(in srgb, var(--sme-texto) 55%, transparent);
+}
+
+/* rótulo microscópico em caixa alta, com tracinho na frente */
+.sme-rotulo{
+  display:flex; align-items:center; gap:var(--sme-e2);
+  font-family:var(--sme-mono);
+  font-size:10px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--sme-texto-3);
+  margin:0;
+}
+.sme-rotulo::before{
+  content:""; width:18px; height:1px; flex:none;
+  background:var(--sme-acento);
+}
+.sme-rotulo--linha::after{ content:""; flex:1; height:1px; background:var(--sme-borda); }
+
+.sme-apoio{ color:var(--sme-texto-2); }
+.sme-num{ font-variant-numeric:tabular-nums; }
+
+/* ─── 4. CABEÇALHO E RODAPÉ ─────────────────────────────── */
+
+.sme-topo,
+.sme-rodape{
+  position:relative; z-index:5;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:var(--sme-e4);
+  padding:var(--sme-e3) var(--sme-e5);
+  flex-wrap:wrap;
+}
+.sme-topo{ border-bottom:1px solid var(--sme-borda); }
+.sme-rodape{ border-top:1px solid var(--sme-borda); }
+
+.sme-marca{
+  display:flex; align-items:baseline; gap:1px;
+  font-size:17px; font-weight:600; letter-spacing:-.01em;
+  text-decoration:none;
+}
+.sme-marca em{ font-style:normal; color:var(--sme-acento); font-weight:400; }
+
+.sme-topo-centro{
+  font-family:var(--sme-serifada);
+  font-size:14px; color:var(--sme-texto-2);
+}
+.sme-topo-centro b{ color:var(--sme-acento); font-weight:400; font-style:italic; }
+
+.sme-menu{ display:flex; gap:var(--sme-e5); font-size:13px; }
+.sme-menu a{ color:var(--sme-texto-2); text-decoration:none; transition:color var(--sme-transicao); }
+.sme-menu a:hover{ color:var(--sme-texto); }
+.sme-menu a[aria-current="page"]{ color:var(--sme-texto); }
+.sme-menu a[aria-current="page"]::before{ content:"/ "; color:var(--sme-acento); }
+
+/* contador de progresso do canto */
+.sme-contador{
+  display:flex; align-items:center; gap:var(--sme-e2);
+  font-family:var(--sme-mono); font-size:10px;
+  letter-spacing:.13em; text-transform:uppercase;
+  color:var(--sme-texto-3);
+}
+.sme-contador::before{
+  content:""; width:6px; height:6px; border-radius:50%; flex:none;
+  background:var(--sme-acento);
+  box-shadow:0 0 9px 1px rgba(var(--sme-acento-rgb),.75);
+}
+
+/* ─── 5. HERÓI ──────────────────────────────────────────── */
+
+.sme-heroi{
+  position:relative; z-index:4;
+  text-align:center;
+  padding:var(--sme-e7) var(--sme-e5) calc(var(--sme-e7) + var(--sme-e5));
+  display:flex; flex-direction:column; align-items:center;
+}
+.sme-heroi .sme-desde{
+  font-family:var(--sme-mono); font-size:10px;
+  letter-spacing:.22em; text-transform:uppercase;
+  color:var(--sme-texto-3); margin-bottom:var(--sme-e5);
+}
+.sme-heroi .sme-titulo{ max-width:23ch; }
+.sme-heroi p{ margin:var(--sme-e5) 0 0; max-width:52ch; color:var(--sme-texto-2); font-size:15px; }
+
+/* ─── 6. BOTÕES ─────────────────────────────────────────── */
+
+.sme-botao{
+  display:inline-flex; align-items:center; gap:var(--sme-e2);
+  border:0; border-radius:var(--sme-r-pilula);
+  padding:11px 22px;
+  background:var(--sme-acento); color:var(--sme-acento-tinta);
+  font-family:var(--sme-sans); font-size:14px; font-weight:600;
+  cursor:pointer; text-decoration:none;
+  box-shadow:0 0 26px -6px rgba(var(--sme-acento-rgb),.55);
+  transition:background var(--sme-transicao), box-shadow var(--sme-transicao), transform var(--sme-transicao);
+}
+.sme-botao:hover{
+  background:var(--sme-texto);
+  box-shadow:0 0 30px -6px rgba(255,255,255,.35);
+  transform:translateY(-1px);
+}
+.sme-botao--vazado{
+  background:transparent; color:var(--sme-texto);
+  border:1px solid var(--sme-borda-forte); box-shadow:none;
+}
+.sme-botao--vazado:hover{
+  background:transparent; color:var(--sme-acento);
+  border-color:var(--sme-acento); transform:none;
+  box-shadow:0 0 22px -10px rgba(var(--sme-acento-rgb),.7);
+}
+
+/* filtro em pílula */
+.sme-filtro{
+  font-size:13px; padding:6px 14px;
+  border-radius:var(--sme-r-pilula);
+  border:1px solid var(--sme-borda-forte);
+  background:transparent; color:var(--sme-texto-2);
+  cursor:pointer; white-space:nowrap; font-family:var(--sme-sans);
+  transition:all var(--sme-transicao);
+}
+.sme-filtro:hover{ color:var(--sme-texto); border-color:var(--sme-texto-3); }
+.sme-filtro[aria-pressed="true"]{
+  background:var(--sme-acento); border-color:var(--sme-acento);
+  color:var(--sme-acento-tinta); font-weight:600;
+}
+
+/* ─── 7. CARTÃO E MURO ──────────────────────────────────── */
+
+.sme-muro{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(216px,1fr));
+  gap:var(--sme-e3);
+  padding:var(--sme-e5);
+  max-width:var(--sme-largura);
+  margin:0 auto;
+  position:relative; z-index:4;
+}
+/* grades fechadas, para quando a contagem de itens é conhecida
+   e uma última fila órfã ficaria feia */
+@media (min-width:900px){
+  .sme-muro--3col{ grid-template-columns:repeat(3,1fr); }
+  .sme-muro--4col{ grid-template-columns:repeat(4,1fr); }
+}
+/* inclinação 3D: só em muro de conteúdo, nunca em tabela */
+.sme-muro--inclinado{ perspective:1400px; }
+.sme-muro--inclinado .sme-cartao{ transform:rotateY(3deg) rotateZ(-.4deg); }
+.sme-muro--inclinado .sme-cartao:nth-child(even){ transform:rotateY(-3deg) rotateZ(.4deg); }
+.sme-muro--inclinado .sme-cartao:hover{ transform:rotateY(0) rotateZ(0) translateY(-2px); }
+
+.sme-cartao{
+  position:relative;
+  display:flex; flex-direction:column; gap:var(--sme-e2);
+  min-height:132px; padding:var(--sme-e4);
+  border:1px solid var(--sme-borda);
+  border-radius:var(--sme-r2);
+  background:var(--sme-superficie);
+  color:inherit; text-decoration:none; text-align:left;
+  cursor:pointer; font:inherit;
+  transition:border-color var(--sme-transicao), background var(--sme-transicao),
+             box-shadow var(--sme-transicao), transform var(--sme-transicao);
+}
+.sme-cartao:hover,
+.sme-cartao[aria-current="true"]{
+  border-color:rgba(var(--sme-acento-rgb),.55);
+  background:linear-gradient(160deg, rgba(var(--sme-acento-rgb),.15), rgba(var(--sme-acento-rgb),.04));
+  box-shadow:0 0 34px -10px rgba(var(--sme-acento-rgb),.55);
+}
+.sme-cartao .sme-cartao-grupo{
+  font-family:var(--sme-mono); font-size:9px;
+  letter-spacing:.15em; text-transform:uppercase; color:var(--sme-texto-3);
+}
+.sme-cartao .sme-cartao-titulo{
+  font-family:var(--sme-serifada); font-size:21px; line-height:1.12;
+  letter-spacing:-.01em; color:var(--sme-texto);
+}
+.sme-cartao .sme-cartao-desc{ font-size:13px; line-height:1.44; color:var(--sme-texto-2); }
+.sme-cartao .sme-cartao-seta{ margin-top:auto; font-size:15px; color:var(--sme-acento); }
+
+/* faísca no canto, aparece no hover */
+.sme-cartao .sme-faisca{
+  position:absolute; top:11px; right:11px;
+  width:6px; height:6px; border-radius:50%;
+  background:var(--sme-acento);
+  box-shadow:0 0 8px 1px rgba(var(--sme-acento-rgb),.85);
+  opacity:0; transition:opacity var(--sme-transicao);
+}
+.sme-cartao:hover .sme-faisca,
+.sme-cartao[aria-current="true"] .sme-faisca{ opacity:1; }
+
+/* imagem em cinza que ganha cor sob o cursor */
+.sme-foto{
+  height:74px; border-radius:var(--sme-r1);
+  border:1px solid var(--sme-borda);
+  filter:grayscale(1) contrast(1.06);
+  transition:filter .35s ease;
+}
+.sme-cartao:hover .sme-foto{ filter:grayscale(0) saturate(1.1); }
+
+/* assinatura de autoria */
+.sme-autoria{ display:flex; align-items:center; gap:var(--sme-e2); margin-top:auto; }
+.sme-autoria .sme-avatar{
+  width:26px; height:26px; border-radius:50%; flex:none;
+  border:1px solid var(--sme-borda-forte);
+  filter:grayscale(1);
+}
+.sme-autoria .sme-autoria-nome{ font-size:11.5px; font-weight:500; line-height:1.3; }
+.sme-autoria .sme-autoria-papel{
+  font-size:9px; letter-spacing:.08em; text-transform:uppercase; color:var(--sme-texto-3);
+}
+
+/* ─── 8. INDICADORES (KPI) ──────────────────────────────── */
+
+.sme-kpis{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(172px,1fr));
+  gap:var(--sme-e3);
+}
+.sme-kpi{
+  display:flex; flex-direction:column; gap:var(--sme-e2);
+  padding:var(--sme-e4);
+  border:1px solid var(--sme-borda);
+  border-radius:var(--sme-r2);
+  background:var(--sme-superficie);
+}
+.sme-kpi-rotulo{
+  font-family:var(--sme-mono); font-size:9.5px;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--sme-texto-3);
+}
+.sme-kpi-valor{
+  font-family:var(--sme-serifada); font-size:38px; line-height:1;
+  letter-spacing:-.02em; font-variant-numeric:tabular-nums;
+}
+.sme-kpi-nota{ font-size:12px; color:var(--sme-texto-2); display:flex; align-items:center; gap:5px; }
+.sme-kpi-nota b{ font-weight:600; }
+.sme-alta{ color:var(--sme-ok); }
+.sme-baixa{ color:var(--sme-critico); }
+.sme-mini{ display:block; width:100%; height:26px; }
+
+/* ─── 9. TABELA ─────────────────────────────────────────── */
+
+.sme-tabela-caixa{
+  border:1px solid var(--sme-borda);
+  border-radius:var(--sme-r2);
+  overflow:hidden;
+}
+.sme-rolagem{ overflow-x:auto; }
+.sme-tabela{ width:100%; border-collapse:collapse; font-size:13.5px; }
+.sme-tabela th{
+  text-align:left; font-family:var(--sme-mono);
+  font-size:9.5px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--sme-texto-3); font-weight:400;
+  padding:11px var(--sme-e3);
+  border-bottom:1px solid var(--sme-borda);
+  background:var(--sme-superficie);
+  white-space:nowrap;
+}
+.sme-tabela td{
+  padding:12px var(--sme-e3);
+  border-bottom:1px solid var(--sme-borda);
+  color:var(--sme-texto-2);
+}
+.sme-tabela tbody tr:last-child td{ border-bottom:0; }
+.sme-tabela tbody tr:hover td{ background:rgba(var(--sme-acento-rgb),.05); }
+.sme-tabela td.sme-td-principal{ color:var(--sme-texto); font-weight:500; }
+.sme-tabela td.sme-td-num{ font-family:var(--sme-mono); font-size:12px; font-variant-numeric:tabular-nums; }
+
+/* faixa de severidade na primeira célula */
+.sme-tabela td.sme-td-faixa{ border-left:2px solid transparent; }
+.sme-tabela tr.sme-linha-critica td.sme-td-faixa{ border-left-color:var(--sme-critico); }
+.sme-tabela tr.sme-linha-atencao td.sme-td-faixa{ border-left-color:var(--sme-atencao); }
+.sme-tabela tr.sme-linha-ok td.sme-td-faixa{ border-left-color:var(--sme-ok); }
+
+/* estado: cor E forma, para quem não distingue cor */
+.sme-estado{
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:11.5px; font-weight:600; line-height:1.4;
+  padding:3px 10px 3px 8px;
+  border:1px solid currentColor; border-radius:var(--sme-r-pilula);
+  white-space:nowrap;
+}
+.sme-estado::before{ content:""; width:5px; height:5px; border-radius:50%; background:currentColor; }
+.sme-estado--ok{ color:var(--sme-ok); }
+.sme-estado--atencao{ color:var(--sme-atencao); }
+.sme-estado--critico{ color:var(--sme-critico); }
+.sme-estado--neutro{ color:var(--sme-texto-3); }
+
+/* ─── 10. FOLHA CLARA (leitura e formulário) ────────────── */
+
+.sme-folha{
+  background:var(--sme-folha);
+  color:var(--sme-folha-texto);
+  border-radius:var(--sme-r3);
+  padding:var(--sme-e6);
+  box-shadow:var(--sme-sombra);
+  position:relative;
+}
+.sme-folha .sme-rotulo{ color:var(--sme-folha-texto-2); }
+.sme-folha .sme-rotulo::before{ background:var(--sme-folha-borda); }
+.sme-folha-titulo{
+  font-family:var(--sme-serifada); font-weight:400;
+  font-size:clamp(24px,3vw,34px); line-height:1.12;
+  letter-spacing:-.018em; margin:0; color:var(--sme-folha-texto);
+  max-width:22ch;
+}
+.sme-folha-abertura{
+  font-family:var(--sme-serifada); font-size:18px; line-height:1.5;
+  color:var(--sme-folha-texto); margin:0;
+}
+.sme-folha-par{
+  font-family:var(--sme-serifada); font-size:15.5px; line-height:1.62;
+  color:#2A2F34; margin:var(--sme-e3) 0 0; max-width:64ch;
+}
+/* Atenção: o /nk deixa o texto não lido em cinza-claro. Aqui o tom é
+   propositalmente mais escuro do que o da referência, para passar em
+   contraste AA (WCAG/eMAG). Não clarear. */
+.sme-folha-par--adiante{ color:#6B7178; }
+
+.sme-folha-assinatura{ display:flex; align-items:center; gap:var(--sme-e3); }
+.sme-folha-assinatura .sme-avatar{ width:34px; height:34px; border-radius:50%; filter:grayscale(1); flex:none; }
+.sme-folha-assinatura .sme-autoria-nome{ font-size:13px; font-weight:600; color:var(--sme-folha-texto); }
+.sme-folha-assinatura .sme-autoria-papel{ color:var(--sme-folha-texto-2); }
+
+/* ─── 11. FORMULÁRIO ────────────────────────────────────── */
+
+.sme-form{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:var(--sme-e3); }
+.sme-campo{ display:flex; flex-direction:column; gap:0; }
+.sme-campo--largo{ grid-column:1 / -1; }
+
+/* rótulo em negrito e dica em cinza dentro da mesma borda */
+.sme-campo-caixa{
+  display:flex; align-items:baseline; gap:var(--sme-e2);
+  border:1px solid #D8DCE0; border-radius:var(--sme-r1);
+  background:#fff; padding:9px 12px; min-height:42px;
+  transition:border-color var(--sme-transicao), box-shadow var(--sme-transicao);
+}
+.sme-campo--largo .sme-campo-caixa{ align-items:flex-start; min-height:96px; }
+.sme-campo-caixa:focus-within{
+  border-color:#0F72A8;
+  box-shadow:0 0 0 3px rgba(15,114,168,.14);
+}
+.sme-campo-nome{ font-size:13px; font-weight:600; color:#1A1E22; white-space:nowrap; }
+.sme-campo-nome sup{ color:#0F72A8; }
+.sme-campo-caixa input,
+.sme-campo-caixa select,
+.sme-campo-caixa textarea{
+  flex:1; min-width:0; border:0; outline:0; background:transparent;
+  font-family:var(--sme-sans); font-size:13px; color:#1A1E22;
+  padding:0; resize:vertical;
+}
+.sme-campo-caixa textarea{ min-height:74px; line-height:1.5; }
+.sme-campo-caixa input::placeholder,
+.sme-campo-caixa textarea::placeholder{ color:#A9B0B6; }
+
+.sme-consentimento{
+  display:flex; align-items:center; gap:var(--sme-e2);
+  font-size:12px; color:var(--sme-folha-texto-2);
+}
+.sme-consentimento input{ accent-color:#0F72A8; width:15px; height:15px; }
+
+/* botão de envio dentro da folha clara */
+.sme-folha .sme-botao{ box-shadow:none; }
+.sme-folha .sme-botao:hover{ background:#0F72A8; color:#fff; box-shadow:none; }
+
+/* ─── 12. MOVIMENTO ─────────────────────────────────────── */
+
+/* um único risco de luz atravessando o topo, em laço */
+.sme-cometa{
+  position:absolute; top:8%; left:-16%;
+  width:190px; height:2px; border-radius:2px; z-index:2;
+  pointer-events:none;
+  background:linear-gradient(90deg,
+    rgba(var(--sme-acento-rgb),0),
+    rgba(214,244,255,.9),
+    rgba(var(--sme-acento-rgb),0));
+  filter:blur(.6px);
+  box-shadow:0 0 16px 3px rgba(var(--sme-acento-rgb),.55);
+  animation:sme-cometa 11s linear infinite;
+}
+@keyframes sme-cometa{
+  0%{ transform:translate3d(0,0,0) rotate(7deg); opacity:0; }
+  8%{ opacity:.95; }
+  60%{ opacity:.7; }
+  100%{ transform:translate3d(112vw,60px,0) rotate(7deg); opacity:0; }
+}
+:root[data-tema="claro"] .sme-cometa{ display:none; }
+
+/* máscara de desvanecimento nas laterais de trilhos horizontais */
+.sme-mascara-lateral{
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%);
+          mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%);
+}
+
+@media (prefers-reduced-motion: reduce){
+  .sme *,
+  .sme *::before,
+  .sme *::after{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+  .sme-cometa{ opacity:.3; }
+}
+
+/* ─── 13. RESPONSIVO ────────────────────────────────────── */
+
+@media (max-width:720px){
+  .sme-topo,
+  .sme-rodape{ padding:var(--sme-e3) var(--sme-e4); gap:var(--sme-e3); }
+  .sme-topo-centro{ display:none; }
+  .sme-muro{ grid-template-columns:1fr; padding:var(--sme-e4); }
+  .sme-muro--inclinado .sme-cartao,
+  .sme-muro--inclinado .sme-cartao:nth-child(even){ transform:none; }
+  .sme-heroi{ padding:var(--sme-e6) var(--sme-e4); }
+  .sme-folha{ padding:var(--sme-e5) var(--sme-e4); border-radius:var(--sme-r2); }
+  .sme-kpi-valor{ font-size:30px; }
+  .sme-form{ grid-template-columns:1fr; }
+}
+
+/* ─── 14. IMPRESSÃO ─────────────────────────────────────── */
+
+@media print{
+  .sme{ background:#fff !important; color:#000 !important; }
+  .sme-cometa,
+  .sme-rodape{ display:none !important; }
+  .sme-cartao,
+  .sme-kpi,
+  .sme-tabela-caixa{ border-color:#999 !important; box-shadow:none !important; background:#fff !important; }
+  .sme-tabela td,
+  .sme-tabela th{ color:#000 !important; }
+}

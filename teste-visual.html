@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-tema="escuro" data-acento="ciano">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Teste visual — Sistemas SME Ribeirão Preto</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="sme-ui.css">
+
+<style>
+  /* ---- Estilos APENAS da página de teste. Nada aqui vai para produção. ---- */
+  body{ margin:0; min-height:100vh; display:flex; flex-direction:column; }
+
+  /* faixa de aviso — deixa claro que não é o sistema real */
+  .t-aviso{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    flex-wrap:wrap; text-align:center;
+    padding:7px 16px;
+    background:#E8B54A; color:#2A1D00;
+    font:600 12.5px/1.4 "DM Sans",system-ui,sans-serif;
+    letter-spacing:.01em;
+  }
+  .t-aviso b{ font-weight:700; }
+  .t-aviso span{ font-weight:400; opacity:.85; }
+
+  /* barra de controles de validação */
+  .t-barra{
+    position:sticky; top:31px; z-index:49;
+    display:flex; align-items:center; gap:18px; flex-wrap:wrap;
+    padding:10px 24px;
+    background:var(--sme-fundo);
+    border-bottom:1px solid var(--sme-borda);
+  }
+  .t-grupo{ display:flex; align-items:center; gap:7px; }
+  .t-grupo > span{
+    font-family:var(--sme-mono); font-size:9.5px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--sme-texto-3);
+  }
+  .t-opcoes{ display:flex; border:1px solid var(--sme-borda); border-radius:999px; padding:2px; gap:2px; }
+  .t-opcoes button{
+    border:0; background:transparent; cursor:pointer;
+    font:500 12px/1 "DM Sans",system-ui,sans-serif;
+    color:var(--sme-texto-2); padding:6px 13px; border-radius:999px;
+    transition:background .2s, color .2s;
+  }
+  .t-opcoes button[aria-pressed="true"]{ background:var(--sme-acento); color:var(--sme-acento-tinta); font-weight:600; }
+  .t-barra .t-espaco{ flex:1; }
+  .t-versao{ font-family:var(--sme-mono); font-size:10px; color:var(--sme-texto-3); letter-spacing:.06em; }
+
+  /* abas de tela */
+  .t-abas{ display:flex; gap:4px; flex-wrap:wrap; padding:16px 24px 0; }
+  .t-abas button{
+    border:1px solid var(--sme-borda); background:transparent; cursor:pointer;
+    font:500 13px/1 "DM Sans",system-ui,sans-serif; color:var(--sme-texto-2);
+    padding:9px 16px; border-radius:999px; transition:all .2s;
+  }
+  .t-abas button:hover{ color:var(--sme-texto); border-color:var(--sme-borda-forte); }
+  .t-abas button[aria-selected="true"]{
+    background:var(--sme-acento); border-color:var(--sme-acento);
+    color:var(--sme-acento-tinta); font-weight:600;
+  }
+
+  /* moldura da tela demonstrada */
+  .t-palco{ padding:16px 24px 40px; flex:1; }
+  .t-tela{
+    border:1px solid var(--sme-borda);
+    border-radius:14px;
+    overflow:hidden;
+    position:relative;
+    background:var(--sme-fundo);
+    background-image:
+      radial-gradient(52% 46% at 50% -8%, rgba(var(--sme-halo),var(--sme-halo-forca)) 0%, rgba(var(--sme-halo),0) 66%),
+      radial-gradient(74% 36% at 50% 106%, rgba(var(--sme-halo),calc(var(--sme-halo-forca) * .7)) 0%, rgba(var(--sme-halo),0) 70%);
+  }
+  .t-tela[hidden]{ display:none; }
+
+  /* combinação folha clara sobre o mundo escuro */
+  .t-sobreposto{ display:flex; gap:0; min-height:440px; }
+  .t-fundo{ flex:1; min-width:0; filter:blur(2.5px) saturate(.85); opacity:.6; pointer-events:none; }
+  .t-frente{ width:min(560px,58%); flex:none; }
+  .t-frente .sme-folha{ border-radius:0; height:100%; box-shadow:none; padding-right:62px; }
+
+  /* trilho vertical de progresso de leitura */
+  .t-trilho{
+    position:absolute; right:14px; top:50%;
+    transform:translateY(-50%) rotate(180deg);
+    writing-mode:vertical-rl;
+    font-family:var(--sme-mono); font-size:9px; letter-spacing:.16em;
+    text-transform:uppercase; color:#9AA2A9;
+    display:flex; align-items:center; gap:16px;
+  }
+  .t-trilho em{ font-style:normal; color:#0F72A8; }
+
+  /* fotos falsas: coloridas por baixo do filtro cinza */
+  .f1{ background:linear-gradient(145deg,#c9a27a,#5a3f2e 55%,#8f6a4a); }
+  .f2{ background:linear-gradient(120deg,#4a6a80,#a9c2cf 40%,#26383f); }
+  .f3{ background:linear-gradient(200deg,#b09a6a,#4a4a2e 70%,#7d7a52); }
+  .f4{ background:linear-gradient(160deg,#8a6f9c,#33263d 60%,#6b5a7a); }
+
+  /* checklist de validação */
+  .t-check{ padding:8px 24px 64px; }
+  .t-check .t-caixa{
+    border:1px solid var(--sme-borda); border-radius:14px;
+    background:var(--sme-superficie);
+    padding:26px 28px;
+    max-width:760px;
+  }
+  .t-check h2{
+    font-family:var(--sme-serifada); font-weight:400; font-size:26px;
+    letter-spacing:-.015em; margin:0 0 6px;
+  }
+  .t-check p{ margin:0; color:var(--sme-texto-2); font-size:14.5px; max-width:62ch; }
+  .t-check ul{ margin:18px 0 0; padding:0; list-style:none; }
+  .t-check li{
+    position:relative;
+    padding:12px 0 12px 30px;
+    border-bottom:1px solid var(--sme-borda);
+    font-size:14px; line-height:1.55; color:var(--sme-texto-2);
+  }
+  .t-check li:last-child{ border-bottom:0; }
+  .t-check li::before{
+    content:""; position:absolute; left:0; top:16px;
+    width:15px; height:15px;
+    border:1px solid var(--sme-borda-forte); border-radius:3px;
+  }
+  .t-check li b{ color:var(--sme-texto); font-weight:600; }
+  .t-check code{
+    font-family:var(--sme-mono); font-size:12.5px;
+    color:var(--sme-acento);
+    background:rgba(var(--sme-acento-rgb),.10);
+    padding:1px 5px; border-radius:3px;
+  }
+
+  @media (max-width:720px){
+    .t-barra{ top:44px; padding:10px 16px; gap:12px; }
+    .t-abas,.t-palco,.t-check{ padding-left:16px; padding-right:16px; }
+    .t-sobreposto{ flex-direction:column; }
+    .t-fundo{ display:none; }
+    .t-frente{ width:100%; }
+    .t-frente .sme-folha{ padding-right:var(--sme-e4); }
+    .t-trilho{ display:none; }
+  }
+</style>
+</head>
+
+<body class="sme">
+
+<div class="t-aviso">
+  <b>AMBIENTE DE TESTE</b>
+  <span>Esta página não é um sistema em funcionamento e não está em produção. Serve só para validar a proposta visual.</span>
+</div>
+
+<div class="t-barra">
+  <div class="t-grupo">
+    <span>Tema</span>
+    <div class="t-opcoes" id="ctl-tema">
+      <button type="button" data-v="escuro" aria-pressed="true">Escuro</button>
+      <button type="button" data-v="claro" aria-pressed="false">Claro</button>
+    </div>
+  </div>
+  <div class="t-grupo">
+    <span>Ciano</span>
+    <div class="t-opcoes" id="ctl-acento">
+      <button type="button" data-v="ciano" aria-pressed="true">#45D6F2</button>
+      <button type="button" data-v="neon" aria-pressed="false">#00E5FF</button>
+    </div>
+  </div>
+  <div class="t-espaco"></div>
+  <span class="t-versao">sme-ui.css · validação</span>
+</div>
+
+<nav class="t-abas" role="tablist" aria-label="Telas de teste">
+  <button type="button" role="tab" aria-selected="true"  data-tela="portal">Portal</button>
+  <button type="button" role="tab" aria-selected="false" data-tela="acervo">Acervo</button>
+  <button type="button" role="tab" aria-selected="false" data-tela="leitura">Leitura</button>
+  <button type="button" role="tab" aria-selected="false" data-tela="painel">Painel</button>
+  <button type="button" role="tab" aria-selected="false" data-tela="formulario">Formulário</button>
+</nav>
+
+<main class="t-palco">
+
+  <!-- ═══════════ PORTAL ═══════════ -->
+  <section class="t-tela" id="tela-portal" role="tabpanel" aria-label="Portal de sistemas">
+    <span class="sme-cometa" aria-hidden="true"></span>
+
+    <header class="sme-topo">
+      <a class="sme-marca" href="#"><em>/</em>sme</a>
+      <div class="sme-topo-centro">a rede que <b>trabalha junto</b></div>
+      <span class="sme-contador">SEUS ACESSOS 4/11</span>
+    </header>
+
+    <div class="sme-heroi">
+      <div class="sme-desde">Ribeirão Preto · Secretaria Municipal de Educação</div>
+      <h1 class="sme-titulo sme-titulo--g">
+        Antes de <span class="sme-enfase">organizar</span> a rede,<br>
+        a rede nos <span class="sme-enfase">organizou</span>.
+      </h1>
+      <p>Onze sistemas construídos com quem usa: diretoras, secretárias, engenheiros, nutricionistas e professores da rede municipal.</p>
+      <p style="margin-top:26px"><a class="sme-botao" href="#tela-acervo">Entrar nos sistemas →</a></p>
+    </div>
+
+    <div class="sme-muro sme-muro--inclinado sme-muro--3col">
+      <button class="sme-cartao" type="button">
+        <span class="sme-faisca"></span>
+        <span class="sme-cartao-grupo">Pedagógico</span>
+        <span class="sme-cartao-titulo">MAPA</span>
+        <span class="sme-cartao-desc">Atribuição, frequência, fluência e boletim.</span>
+        <span class="sme-cartao-seta">→</span>
+      </button>
+      <button class="sme-cartao" type="button">
+        <span class="sme-faisca"></span>
+        <span class="sme-cartao-grupo">Infraestrutura</span>
+        <span class="sme-cartao-titulo">GOM</span>
+        <span class="sme-cartao-desc">Obras, manutenção e ordens de serviço.</span>
+        <span class="sme-cartao-seta">→</span>
+      </button>
+      <button class="sme-cartao" type="button">
+        <span class="sme-faisca"></span>
+        <span class="sme-cartao-grupo">Atendimento</span>
+        <span class="sme-cartao-titulo">SATE</span>
+        <span class="sme-cartao-desc">Registro e acompanhamento de atendimentos.</span>
+        <span class="sme-cartao-seta">→</span>
+      </button>
+      <button class="sme-cartao" type="button">
+        <span class="sme-faisca"></span>
+        <span class="sme-cartao-grupo">Alimentação</span>
+        <span class="sme-cartao-titulo">Cardápio</span>
+        <span class="sme-cartao-desc">Cardápios da rede e custo por refeição.</span>
+        <span class="sme-cartao-seta">→</span>
+      </button>
+      <button class="sme-cartao" type="button">
+        <span class="sme-faisca"></span>
+        <span class="sme-cartao-grupo">Gestão</span>
+        <span class="sme-cartao-titulo">Lunar</span>
+        <span class="sme-cartao-desc">Demandas entre unidades e chefias.</span>
+        <span class="sme-cartao-seta">→</span>
+      </button>
+      <button class="sme-cartao" type="button">
+        <span class="sme-faisca"></span>
+        <span class="sme-cartao-grupo">Publicações</span>
+        <span class="sme-cartao-titulo">Repositório</span>
+        <span class="sme-cartao-desc">Documentos e materiais da rede.</span>
+        <span class="sme-cartao-seta">→</span>
+      </button>
+    </div>
+
+    <footer class="sme-rodape">
+      <nav class="sme-menu">
+        <a href="#" aria-current="page">Início</a>
+        <a href="#">Sistemas</a>
+        <a href="#">Ajuda</a>
+        <a href="#">Contato</a>
+      </nav>
+      <span class="sme-contador">SEUS ACESSOS 4/11</span>
+    </footer>
+  </section>
+
+  <!-- ═══════════ ACERVO ═══════════ -->
+  <section class="t-tela" id="tela-acervo" role="tabpanel" aria-label="Acervo do repositório" hidden>
+    <span class="sme-cometa" aria-hidden="true"></span>
+
+    <header class="sme-topo">
+      <a class="sme-marca" href="#"><em>/</em>sme</a>
+      <div class="sme-topo-centro">acervo <b>da rede</b></div>
+      <span class="sme-contador">LIDOS 6/48</span>
+    </header>
+
+    <div class="sme-larg" style="padding-top:28px">
+      <p class="sme-rotulo sme-rotulo--linha">Publicações da Secretaria</p>
+      <h2 class="sme-titulo sme-titulo--m" style="margin-top:14px">O que a rede escreveu sobre a própria rede</h2>
+    </div>
+
+    <div class="sme-muro sme-muro--inclinado sme-muro--3col">
+      <button class="sme-cartao" type="button">
+        <span class="sme-faisca"></span>
+        <span class="sme-cartao-titulo">Alfabetização nos anos iniciais</span>
+        <span class="sme-autoria">
+          <span class="sme-avatar f1"></span>
+          <span><span class="sme-autoria-nome">Coordenadoria Pedagógica</span><br><span class="sme-autoria-papel">Caderno · 2025</span></span>
+        </span>
+      </button>
+      <button class="sme-cartao" type="button">
+        <span class="sme-faisca"></span>
+        <span class="sme-foto f2"></span>
+        <span class="sme-cartao-titulo">Semana da Educação Municipal</span>
+        <span class="sme-autoria">
+          <span class="sme-avatar f3"></span>
+          <span><span class="sme-autoria-nome">Assessoria de Comunicação</span><br><span class="sme-autoria-papel">Registro · 2024</span></span>
+        </span>
+      </button>
+      <button class="sme-cartao" type="button" aria-current="true">
+        <span class="sme-faisca"></span>
+        <span class="sme-cartao-titulo">Currículo de Ribeirão Preto</span>
+        <span class="sme-autoria">
+          <span class="sme-avatar f2"></span>
+          <span><span class="sme-autoria-nome">Departamento Pedagógico</span><br><span class="sme-autoria-papel">Documento · 2023</span></span>
+        </span>
+      </button>
+      <button class="sme-cartao" type="button">
+        <span class="sme-faisca"></span>
+        <span class="sme-foto f3"></span>
+        <span class="sme-cartao-titulo">Educação especial: práticas na rede</span>
+        <span class="sme-autoria">
+          <span class="sme-avatar f4"></span>
+          <span><span class="sme-autoria-nome">Educação Especial</span><br><span class="sme-autoria-papel">Relato · 2025</span></span>
+        </span>
+      </button>
+      <button class="sme-cartao" type="button">
+        <span class="sme-faisca"></span>
+        <span class="sme-cartao-titulo">Guia de acolhimento de novos professores</span>
+        <span class="sme-autoria">
+          <span class="sme-avatar f1"></span>
+          <span><span class="sme-autoria-nome">Formação Continuada</span><br><span class="sme-autoria-papel">Guia · 2025</span></span>
+        </span>
+      </button>
+      <button class="sme-cartao" type="button">
+        <span class="sme-faisca"></span>
+        <span class="sme-foto f4"></span>
+        <span class="sme-cartao-titulo">Revista da Educação nº 12</span>
+        <span class="sme-autoria">
+          <span class="sme-avatar f2"></span>
+          <span><span class="sme-autoria-nome">Assessoria de Comunicação</span><br><span class="sme-autoria-papel">Revista · 2026</span></span>
+        </span>
+      </button>
+    </div>
+
+    <footer class="sme-rodape">
+      <nav class="sme-menu">
+        <a href="#">Início</a>
+        <a href="#" aria-current="page">Acervo</a>
+        <a href="#">Coleções</a>
+        <a href="#">Enviar material</a>
+      </nav>
+      <span class="sme-contador">LIDOS 6/48</span>
+    </footer>
+  </section>
+
+  <!-- ═══════════ LEITURA ═══════════ -->
+  <section class="t-tela" id="tela-leitura" role="tabpanel" aria-label="Artigo aberto" hidden>
+    <div class="t-sobreposto">
+      <div class="t-fundo" aria-hidden="true">
+        <header class="sme-topo">
+          <a class="sme-marca" href="#"><em>/</em>sme</a>
+          <div class="sme-topo-centro">revista <b>da educação</b></div>
+        </header>
+        <div class="sme-muro sme-muro--inclinado">
+          <div class="sme-cartao"><span class="sme-cartao-titulo">Alfabetização nos anos iniciais</span></div>
+          <div class="sme-cartao" aria-current="true"><span class="sme-cartao-titulo">A escola que escuta antes de decidir</span></div>
+          <div class="sme-cartao"><span class="sme-foto f3"></span><span class="sme-cartao-titulo">Educação especial</span></div>
+          <div class="sme-cartao"><span class="sme-cartao-titulo">Guia de acolhimento de novos professores</span></div>
+          <div class="sme-cartao"><span class="sme-foto f1"></span><span class="sme-cartao-titulo">Revista da Educação nº 12</span></div>
+          <div class="sme-cartao"><span class="sme-cartao-titulo">Boas práticas de gestão escolar</span></div>
+        </div>
+      </div>
+
+      <article class="t-frente">
+        <div class="sme-folha">
+          <h1 class="sme-folha-titulo">A escola que escuta antes de decidir</h1>
+
+          <div class="sme-folha-assinatura" style="margin-top:18px">
+            <span class="sme-avatar f2"></span>
+            <span>
+              <span class="sme-autoria-nome">Marta Ribeiro</span><br>
+              <span class="sme-autoria-papel">Diretora · EMEF Prof. João Palma Guião</span>
+            </span>
+          </div>
+
+          <p class="sme-rotulo" style="margin:22px 0 12px">Introdução</p>
+
+          <p class="sme-folha-abertura">Assumi a direção em fevereiro achando que meu trabalho era decidir rápido. Levei um ano para entender que era decidir depois — depois de ouvir as pessoas que já estavam ali.</p>
+
+          <p class="sme-folha-par">A primeira reunião foi um desastre. Eu tinha um plano de quinze páginas e trinta professores em silêncio na minha frente. Ninguém discordou de nada, e foi exatamente esse o problema.</p>
+
+          <p class="sme-folha-par">Uma professora me procurou depois, no corredor. Disse que o plano era bom, mas que a escola já tinha tentado aquilo em 2019 e não funcionou por um motivo que não estava em lugar nenhum do papel.</p>
+
+          <p class="sme-folha-par sme-folha-par--adiante">Perguntei por que ela não tinha falado na reunião. Ela respondeu que ninguém tinha perguntado. Foi a frase mais cara que já ouvi na minha carreira, e ela não custou nada.</p>
+
+          <p class="sme-folha-par sme-folha-par--adiante">A partir dali mudei o formato. Toda proposta passa por três semanas de conversa antes de virar documento.</p>
+
+          <div class="t-trilho" aria-hidden="true">
+            <span>Tempo de leitura 4:20</span>
+            <em>32% lido</em>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ═══════════ PAINEL ═══════════ -->
+  <section class="t-tela" id="tela-painel" role="tabpanel" aria-label="Painel operacional" hidden>
+    <span class="sme-cometa" aria-hidden="true"></span>
+
+    <header class="sme-topo">
+      <a class="sme-marca" href="#"><em>/</em>gom</a>
+      <div class="sme-topo-centro">obras e <b>manutenção</b></div>
+      <span class="sme-contador">SUA EQUIPE 12 ABERTAS</span>
+    </header>
+
+    <div style="padding:24px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:20px">
+        <div>
+          <h2 class="sme-titulo sme-titulo--m">Demandas em aberto</h2>
+          <p class="sme-apoio" style="font-size:13px;margin:5px 0 0">Atualizado há 4 minutos · 217 registros</p>
+        </div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
+          <button class="sme-filtro" type="button" aria-pressed="true">Todas</button>
+          <button class="sme-filtro" type="button" aria-pressed="false">Emergenciais</button>
+          <button class="sme-filtro" type="button" aria-pressed="false">Aguardando orçamento</button>
+          <button class="sme-filtro" type="button" aria-pressed="false">Minha equipe</button>
+        </div>
+      </div>
+
+      <div class="sme-kpis" style="margin-bottom:20px">
+        <div class="sme-kpi">
+          <span class="sme-kpi-rotulo">Em atendimento</span>
+          <span class="sme-kpi-valor">142</span>
+          <svg class="sme-mini" viewBox="0 0 120 26" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0,20 L20,17 L40,19 L60,12 L80,14 L100,8 L120,6 L120,26 L0,26 Z" fill="rgba(var(--sme-acento-rgb),.13)"/>
+            <path d="M0,20 L20,17 L40,19 L60,12 L80,14 L100,8 L120,6" fill="none" stroke="var(--sme-acento)" stroke-width="1.4"/>
+            <circle cx="120" cy="6" r="2.3" fill="var(--sme-acento)"/>
+          </svg>
+          <span class="sme-kpi-nota"><span class="sme-alta">▲ <b>12</b></span> na semana</span>
+        </div>
+        <div class="sme-kpi">
+          <span class="sme-kpi-rotulo">Emergenciais</span>
+          <span class="sme-kpi-valor">18</span>
+          <svg class="sme-mini" viewBox="0 0 120 26" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0,22 L20,21 L40,18 L60,19 L80,13 L100,10 L120,4 L120,26 L0,26 Z" fill="rgba(240,119,107,.14)"/>
+            <path d="M0,22 L20,21 L40,18 L60,19 L80,13 L100,10 L120,4" fill="none" stroke="var(--sme-critico)" stroke-width="1.4"/>
+            <circle cx="120" cy="4" r="2.3" fill="var(--sme-critico)"/>
+          </svg>
+          <span class="sme-kpi-nota"><span class="sme-baixa">▲ <b>5</b></span> na semana</span>
+        </div>
+        <div class="sme-kpi">
+          <span class="sme-kpi-rotulo">Aguardando orçamento</span>
+          <span class="sme-kpi-valor">57</span>
+          <svg class="sme-mini" viewBox="0 0 120 26" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0,14 L20,15 L40,13 L60,15 L80,14 L100,13 L120,14" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".4"/>
+          </svg>
+          <span class="sme-kpi-nota">estável</span>
+        </div>
+        <div class="sme-kpi">
+          <span class="sme-kpi-rotulo">Concluídas no mês</span>
+          <span class="sme-kpi-valor">309</span>
+          <svg class="sme-mini" viewBox="0 0 120 26" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0,21 L20,18 L40,16 L60,13 L80,11 L100,9 L120,5 L120,26 L0,26 Z" fill="rgba(63,214,154,.14)"/>
+            <path d="M0,21 L20,18 L40,16 L60,13 L80,11 L100,9 L120,5" fill="none" stroke="var(--sme-ok)" stroke-width="1.4"/>
+            <circle cx="120" cy="5" r="2.3" fill="var(--sme-ok)"/>
+          </svg>
+          <span class="sme-kpi-nota"><span class="sme-alta">▲ <b>8%</b></span> sobre julho</span>
+        </div>
+      </div>
+
+      <div class="sme-tabela-caixa sme-rolagem">
+        <table class="sme-tabela">
+          <thead>
+            <tr>
+              <th scope="col">Unidade</th>
+              <th scope="col">Solicitação</th>
+              <th scope="col">Aberta em</th>
+              <th scope="col">Dias úteis</th>
+              <th scope="col">Equipe</th>
+              <th scope="col">Situação</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="sme-linha-critica">
+              <td class="sme-td-principal sme-td-faixa">EMEF Prof. João Palma Guião</td>
+              <td>Infiltração no bloco B</td>
+              <td class="sme-td-num">02/08</td><td class="sme-td-num">4</td><td>Equipe 2</td>
+              <td><span class="sme-estado sme-estado--critico">Emergencial</span></td>
+            </tr>
+            <tr class="sme-linha-atencao">
+              <td class="sme-td-principal sme-td-faixa">EMEI Jardim Aeroporto</td>
+              <td>Troca de luminárias</td>
+              <td class="sme-td-num">29/07</td><td class="sme-td-num">8</td><td>Equipe 1</td>
+              <td><span class="sme-estado sme-estado--atencao">Orçamento</span></td>
+            </tr>
+            <tr class="sme-linha-ok">
+              <td class="sme-td-principal sme-td-faixa">EMEF Alberto Jorge Franco</td>
+              <td>Reparo em portão</td>
+              <td class="sme-td-num">27/07</td><td class="sme-td-num">10</td><td>Equipe 3</td>
+              <td><span class="sme-estado sme-estado--ok">Em execução</span></td>
+            </tr>
+            <tr class="sme-linha-ok">
+              <td class="sme-td-principal sme-td-faixa">CEI Vila Virgínia</td>
+              <td>Vazamento na cozinha</td>
+              <td class="sme-td-num">24/07</td><td class="sme-td-num">13</td><td>Equipe 2</td>
+              <td><span class="sme-estado sme-estado--ok">Em execução</span></td>
+            </tr>
+            <tr>
+              <td class="sme-td-principal sme-td-faixa">EMEF Dom Luís do Amaral</td>
+              <td>Pintura de fachada</td>
+              <td class="sme-td-num">18/07</td><td class="sme-td-num">17</td><td>—</td>
+              <td><span class="sme-estado sme-estado--neutro">Na fila</span></td>
+            </tr>
+            <tr>
+              <td class="sme-td-principal sme-td-faixa">EMEI Parque Ribeirão</td>
+              <td>Manutenção de playground</td>
+              <td class="sme-td-num">15/07</td><td class="sme-td-num">19</td><td>—</td>
+              <td><span class="sme-estado sme-estado--neutro">Na fila</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer class="sme-rodape">
+      <nav class="sme-menu">
+        <a href="#" aria-current="page">Demandas</a>
+        <a href="#">Obras</a>
+        <a href="#">Orçamentos</a>
+        <a href="#">Saldo</a>
+      </nav>
+      <span class="sme-contador">SUA EQUIPE 12 ABERTAS</span>
+    </footer>
+  </section>
+
+  <!-- ═══════════ FORMULÁRIO ═══════════ -->
+  <section class="t-tela" id="tela-formulario" role="tabpanel" aria-label="Nova demanda" hidden>
+    <div class="t-sobreposto">
+      <div class="t-fundo" aria-hidden="true">
+        <header class="sme-topo">
+          <a class="sme-marca" href="#"><em>/</em>sme</a>
+          <div class="sme-topo-centro">gestão de <b>demandas</b></div>
+        </header>
+        <div style="padding:24px">
+          <div class="sme-kpis">
+            <div class="sme-kpi"><span class="sme-kpi-rotulo">Em aberto</span><span class="sme-kpi-valor">64</span></div>
+            <div class="sme-kpi"><span class="sme-kpi-rotulo">No prazo</span><span class="sme-kpi-valor">51</span></div>
+            <div class="sme-kpi"><span class="sme-kpi-rotulo">Vencidas</span><span class="sme-kpi-valor">13</span></div>
+          </div>
+          <div class="sme-tabela-caixa" style="margin-top:20px">
+            <table class="sme-tabela">
+              <thead><tr><th>Unidade</th><th>Assunto</th><th>Situação</th></tr></thead>
+              <tbody>
+                <tr><td class="sme-td-principal">EMEF Palma Guião</td><td>Infiltração no bloco B</td><td><span class="sme-estado sme-estado--critico">Emergencial</span></td></tr>
+                <tr><td class="sme-td-principal">EMEI Jardim Aeroporto</td><td>Troca de luminárias</td><td><span class="sme-estado sme-estado--atencao">Orçamento</span></td></tr>
+                <tr><td class="sme-td-principal">CEI Vila Virgínia</td><td>Vazamento na cozinha</td><td><span class="sme-estado sme-estado--ok">Em execução</span></td></tr>
+                <tr><td class="sme-td-principal">EMEF Dom Luís do Amaral</td><td>Pintura de fachada</td><td><span class="sme-estado sme-estado--neutro">Na fila</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="t-frente">
+        <form class="sme-folha" onsubmit="return false">
+          <h2 class="sme-folha-titulo" style="font-size:26px">Abrir uma nova demanda</h2>
+          <p class="sme-apoio" style="color:var(--sme-folha-texto-2);font-size:13.5px;margin-top:10px">
+            Descreva o que a unidade precisa. O número da demanda é gerado automaticamente ao enviar.
+          </p>
+
+          <p class="sme-rotulo" style="margin:24px 0 14px">Dados da solicitação</p>
+
+          <div class="sme-form">
+            <div class="sme-campo">
+              <label class="sme-campo-caixa">
+                <span class="sme-campo-nome">Unidade<sup>*</sup></span>
+                <input type="text" value="EMEF Prof. João Palma Guião">
+              </label>
+            </div>
+            <div class="sme-campo">
+              <label class="sme-campo-caixa">
+                <span class="sme-campo-nome">Tipo<sup>*</sup></span>
+                <select>
+                  <option>Manutenção predial</option>
+                  <option>Elétrica</option>
+                  <option>Hidráulica</option>
+                  <option>Emergencial</option>
+                </select>
+              </label>
+            </div>
+            <div class="sme-campo">
+              <label class="sme-campo-caixa">
+                <span class="sme-campo-nome">Assunto<sup>*</sup></span>
+                <input type="text" placeholder="ex. Infiltração no bloco B">
+              </label>
+            </div>
+            <div class="sme-campo">
+              <label class="sme-campo-caixa">
+                <span class="sme-campo-nome">Prazo</span>
+                <input type="text" placeholder="dd/mm/aaaa">
+              </label>
+            </div>
+            <div class="sme-campo sme-campo--largo">
+              <label class="sme-campo-caixa">
+                <span class="sme-campo-nome">Descrição<sup>*</sup></span>
+                <textarea placeholder="Conte o que está acontecendo, desde quando e o que já foi tentado."></textarea>
+              </label>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-top:22px">
+            <label class="sme-consentimento">
+              <input type="checkbox"> Confirmo que os dados estão corretos.
+            </label>
+            <button class="sme-botao" type="submit">↗ Enviar demanda</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="t-check">
+  <div class="t-caixa">
+    <h2>O que validar</h2>
+    <p>Abra também no celular e num computador da escola. Se algo aqui reprovar, é melhor descobrir agora do que depois de aplicar nos treze sistemas.</p>
+    <ul>
+      <li><b>Ciano.</b> Alterne entre <code>#45D6F2</code> e <code>#00E5FF</code> na barra do topo. Qual cansa menos depois de um minuto olhando a tabela?</li>
+      <li><b>Tema.</b> Alterne escuro e claro. O escuro serve para os sistemas operacionais, ou só para as telas públicas?</li>
+      <li><b>Leitura da tabela.</b> Na aba Painel: dá para achar as emergenciais em menos de dois segundos?</li>
+      <li><b>Densidade.</b> Cabem linhas suficientes na tela, ou ficou espaçado demais para o uso diário?</li>
+      <li><b>Fonte serifada.</b> Os títulos e os números grandes em Newsreader ficaram bem, ou parecem formais demais para um sistema de gestão?</li>
+      <li><b>Celular.</b> As telas Painel e Formulário funcionam no telefone dentro da escola?</li>
+      <li><b>Formulário.</b> O rótulo dentro da caixa do campo é claro, ou confunde quem preenche com pressa?</li>
+      <li><b>Monitor antigo.</b> Num monitor de escola, o fundo escuro fica lavado ou mantém o contraste?</li>
+      <li><b>Campo com valor longo.</b> No Formulário, veja “Unidade”: nomes de escola compridos ficam apertados ao lado do rótulo. Se isso incomodar, eu movo o rótulo para cima do campo nos formulários longos.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var raiz = document.documentElement;
+
+  function grupo(id, attr){
+    var box = document.getElementById(id);
+    if (!box) return;
+    box.addEventListener("click", function(ev){
+      var b = ev.target.closest("button[data-v]");
+      if (!b) return;
+      raiz.setAttribute(attr, b.dataset.v);
+      box.querySelectorAll("button").forEach(function(o){
+        o.setAttribute("aria-pressed", String(o === b));
+      });
+    });
+  }
+  grupo("ctl-tema", "data-tema");
+  grupo("ctl-acento", "data-acento");
+
+  // abas
+  var abas = document.querySelector(".t-abas");
+  abas.addEventListener("click", function(ev){
+    var b = ev.target.closest("button[data-tela]");
+    if (!b) return;
+    abas.querySelectorAll("button").forEach(function(o){
+      o.setAttribute("aria-selected", String(o === b));
+    });
+    document.querySelectorAll(".t-tela").forEach(function(s){
+      s.hidden = (s.id !== "tela-" + b.dataset.tela);
+    });
+  });
+
+  // filtros da tela de painel — só para sentir o clique
+  document.querySelectorAll(".sme-filtro").forEach(function(f){
+    f.addEventListener("click", function(){
+      var irmaos = f.parentElement.querySelectorAll(".sme-filtro");
+      irmaos.forEach(function(o){ o.setAttribute("aria-pressed", String(o === f)); });
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
